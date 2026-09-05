@@ -1,0 +1,790 @@
+﻿{
+    "Completed":  true,
+    "StartedUtc":  "2026-09-05T07:09:50.6271268Z",
+    "FinishedUtc":  "2026-09-05T07:09:56.7665749Z",
+    "BaseUrl":  "http://localhost:18080",
+    "MaxConcurrentRequests":  8,
+    "TotalRequests":  77,
+    "Passed":  77,
+    "Failed":  0,
+    "Checks":  [
+                   {
+                       "Name":  "Admin login",
+                       "Method":  "POST",
+                       "Path":  "/auth/login",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Register",
+                       "Method":  "POST",
+                       "Path":  "/auth/register",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Register",
+                       "Method":  "POST",
+                       "Path":  "/auth/register",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Register",
+                       "Method":  "POST",
+                       "Path":  "/auth/register",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Register",
+                       "Method":  "POST",
+                       "Path":  "/auth/register",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Login",
+                       "Method":  "POST",
+                       "Path":  "/auth/login",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Login",
+                       "Method":  "POST",
+                       "Path":  "/auth/login",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Login",
+                       "Method":  "POST",
+                       "Path":  "/auth/login",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Login",
+                       "Method":  "POST",
+                       "Path":  "/auth/login",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Create Java",
+                       "Method":  "POST",
+                       "Path":  "/admin/skills",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Create SQL",
+                       "Method":  "POST",
+                       "Path":  "/admin/skills",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Create job",
+                       "Method":  "POST",
+                       "Path":  "/admin/jobs",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Require Java",
+                       "Method":  "POST",
+                       "Path":  "/admin/jobs/2/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Require SQL",
+                       "Method":  "POST",
+                       "Path":  "/admin/jobs/2/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Add Java skill",
+                       "Method":  "POST",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Add Java skill",
+                       "Method":  "POST",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Add Java skill",
+                       "Method":  "POST",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Add Java skill",
+                       "Method":  "POST",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Add SQL skill",
+                       "Method":  "POST",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Add SQL skill",
+                       "Method":  "POST",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Add SQL skill",
+                       "Method":  "POST",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Add SQL skill",
+                       "Method":  "POST",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own profile",
+                       "Method":  "GET",
+                       "Path":  "/user/profile",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own profile",
+                       "Method":  "GET",
+                       "Path":  "/user/profile",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own profile",
+                       "Method":  "GET",
+                       "Path":  "/user/profile",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own profile",
+                       "Method":  "GET",
+                       "Path":  "/user/profile",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own skills",
+                       "Method":  "GET",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Browse jobs",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Job details",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Skill gap",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2/skill-gap",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Recommendations",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2/recommendations",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Empty applications",
+                       "Method":  "GET",
+                       "Path":  "/user/applications",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own skills",
+                       "Method":  "GET",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Browse jobs",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Job details",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Skill gap",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2/skill-gap",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Recommendations",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2/recommendations",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Empty applications",
+                       "Method":  "GET",
+                       "Path":  "/user/applications",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own skills",
+                       "Method":  "GET",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Browse jobs",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Job details",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Skill gap",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2/skill-gap",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Recommendations",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2/recommendations",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Empty applications",
+                       "Method":  "GET",
+                       "Path":  "/user/applications",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own skills",
+                       "Method":  "GET",
+                       "Path":  "/user/skills",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Browse jobs",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Job details",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Skill gap",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2/skill-gap",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Recommendations",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/2/recommendations",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Empty applications",
+                       "Method":  "GET",
+                       "Path":  "/user/applications",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Duplicate application race",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  201,
+                       "Expected":  [
+                                        201,
+                                        409
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Duplicate application race",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  409,
+                       "Expected":  [
+                                        201,
+                                        409
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Duplicate application race",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  409,
+                       "Expected":  [
+                                        201,
+                                        409
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Duplicate application race",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  409,
+                       "Expected":  [
+                                        201,
+                                        409
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Duplicate application race",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  409,
+                       "Expected":  [
+                                        201,
+                                        409
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Duplicate application race",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  409,
+                       "Expected":  [
+                                        201,
+                                        409
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Duplicate application race",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  409,
+                       "Expected":  [
+                                        201,
+                                        409
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Duplicate application race",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  409,
+                       "Expected":  [
+                                        201,
+                                        409
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Other student applies",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Other student applies",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Other student applies",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  201,
+                       "Expected":  [
+                                        201
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Select applicant",
+                       "Method":  "PUT",
+                       "Path":  "/admin/applications/14/status",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Select applicant",
+                       "Method":  "PUT",
+                       "Path":  "/admin/applications/21/status",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Select applicant",
+                       "Method":  "PUT",
+                       "Path":  "/admin/applications/22/status",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Select applicant",
+                       "Method":  "PUT",
+                       "Path":  "/admin/applications/20/status",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own application",
+                       "Method":  "GET",
+                       "Path":  "/user/applications",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own application",
+                       "Method":  "GET",
+                       "Path":  "/user/applications",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own application",
+                       "Method":  "GET",
+                       "Path":  "/user/applications",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Own application",
+                       "Method":  "GET",
+                       "Path":  "/user/applications",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Missing token",
+                       "Method":  "GET",
+                       "Path":  "/user/profile",
+                       "Status":  401,
+                       "Expected":  [
+                                        401
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Invalid token",
+                       "Method":  "GET",
+                       "Path":  "/user/profile",
+                       "Status":  401,
+                       "Expected":  [
+                                        401
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "User denied admin",
+                       "Method":  "GET",
+                       "Path":  "/admin/dashboard",
+                       "Status":  403,
+                       "Expected":  [
+                                        403
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Admin denied user",
+                       "Method":  "GET",
+                       "Path":  "/user/profile",
+                       "Status":  403,
+                       "Expected":  [
+                                        403
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Injected studentId",
+                       "Method":  "POST",
+                       "Path":  "/user/applications",
+                       "Status":  400,
+                       "Expected":  [
+                                        400
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Invalid proficiency",
+                       "Method":  "POST",
+                       "Path":  "/user/skills",
+                       "Status":  400,
+                       "Expected":  [
+                                        400
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Missing job",
+                       "Method":  "GET",
+                       "Path":  "/user/jobs/9223372036854775807",
+                       "Status":  404,
+                       "Expected":  [
+                                        404
+                                    ],
+                       "Passed":  true
+                   },
+                   {
+                       "Name":  "Admin dashboard",
+                       "Method":  "GET",
+                       "Path":  "/admin/dashboard",
+                       "Status":  200,
+                       "Expected":  [
+                                        200
+                                    ],
+                       "Passed":  true
+                   }
+               ]
+}
