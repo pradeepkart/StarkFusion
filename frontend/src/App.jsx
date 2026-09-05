@@ -1,682 +1,186 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import useAuth from "./hooks/useAuth";
+import * as auth from "./services/authService";
+import * as jobsApi from "./services/jobService";
+import * as skillsApi from "./services/skillService";
+import * as studentsApi from "./services/studentService";
+import * as applicationsApi from "./services/applicationService";
+import { getDashboardStats } from "./services/adminService";
+import { getSkillGaps } from "./services/skillGapService";
+import { getRecommendations } from "./services/recommendationService";
+import { APPLICATION_STATUSES, ROLES } from "./utils/constants";
+import logo from "./assets/icons/starkfusion-mark.svg";
+import "./portal.css";
 
-const seedJobs = [
-  {
-    id: 1,
-    title: "Frontend Developer Intern",
-    company: "Nova Labs",
-    location: "Remote",
-    skills: ["React", "JavaScript", "CSS"],
-  },
-  {
-    id: 2,
-    title: "Data Analyst",
-    company: "Insight Co.",
-    location: "Bengaluru",
-    skills: ["Python", "SQL", "Excel"],
-  },
-  {
-    id: 3,
-    title: "UI Designer",
-    company: "Pixel Studio",
-    location: "Chennai",
-    skills: ["Figma", "CSS", "Communication"],
-  },
-];
-const seedStudent = {
-  id: 1,
-  name: "Aarav Kumar",
-  email: "aarav@example.com",
-  skills: ["React", "JavaScript", "CSS"],
-};
-const load = (key, fallback) => {
-  try {
-    return JSON.parse(localStorage.getItem(key)) ?? fallback;
-  } catch {
-    return fallback;
-  }
-};
+const levels = ["Beginner", "Basic", "Intermediate", "Advanced", "Expert"];
+const values = (form) => Object.fromEntries(new FormData(form));
+const errorText = (error) => [error.message || "Something went wrong.", ...Object.values(error.errors || {})].join(" ");
 
 export default function App() {
-  const [user, setUser] = useState(() => load("sb-user", null));
-  const [jobs, setJobs] = useState(() => load("sb-jobs", seedJobs));
-  const [student, setStudent] = useState(() => load("sb-student", seedStudent));
-  const [applications, setApplications] = useState(() =>
-    load("sb-applications", []),
-  );
-  const [view, setView] = useState("dashboard");
-
-  useEffect(
-    () => localStorage.setItem("sb-jobs", JSON.stringify(jobs)),
-    [jobs],
-  );
-  useEffect(
-    () => localStorage.setItem("sb-student", JSON.stringify(student)),
-    [student],
-  );
-  useEffect(
-    () => localStorage.setItem("sb-applications", JSON.stringify(applications)),
-    [applications],
-  );
-  useEffect(
-    () =>
-      user
-        ? localStorage.setItem("sb-user", JSON.stringify(user))
-        : localStorage.removeItem("sb-user"),
-    [user],
-  );
-
-  if (!user) {
-    return (
-      <Login
-        onLogin={(account) => {
-          if (account.name)
-            setStudent((currentStudent) => ({
-              ...currentStudent,
-              name: account.name,
-              email: account.email,
-            }));
-          setUser({ role: account.role });
-          setView("dashboard");
-        }}
-      />
-    );
-  }
-  return user.role === "admin" ? (
-    <Admin
-      jobs={jobs}
-      setJobs={setJobs}
-      applications={applications}
-      view={view}
-      setView={setView}
-      logout={() => setUser(null)}
-    />
-  ) : (
-    <Student
-      student={student}
-      setStudent={setStudent}
-      jobs={jobs}
-      applications={applications}
-      setApplications={setApplications}
-      view={view}
-      setView={setView}
-      logout={() => setUser(null)}
-    />
-  );
+  const { user } = useAuth();
+  return user ? <Workspace key={user.email} user={user} /> : <Login />;
 }
 
-function Login({ onLogin }) {
-  const [mode, setMode] = useState("login");
-  const [role, setRole] = useState("student");
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
-
-  function updateForm(event) {
-    setForm({ ...form, [event.target.name]: event.target.value });
-  }
-
-  function submitForm(event) {
-    event.preventDefault();
-    onLogin({
-      role,
-      name: mode === "signup" ? form.name : "",
-      email: form.email,
-    });
-  }
-
-  return (
-    <main className="grid min-h-screen place-items-center overflow-hidden bg-[#080d1b] p-5 text-slate-100">
-      <div className="pointer-events-none absolute h-[540px] w-[540px] rounded-full bg-fuchsia-500/20 blur-[130px]" />
-      <section className="relative w-full max-w-md rounded-[2rem] border border-white/10 bg-slate-950/70 p-8 shadow-2xl backdrop-blur-xl">
-        <Brand />
-        <p className="mt-8 text-xs font-bold uppercase tracking-[.25em] text-cyan-300">
-          Career intelligence network
-        </p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight text-white">
-          {mode === "login" ? "Welcome back." : "Create your fusion profile."}
-        </h1>
-        <p className="mt-2 text-slate-400">
-          {mode === "login"
-            ? "Enter StarkFusion’s adaptive career workspace."
-            : "Start matching your skills with opportunity."}
-        </p>
-        <div className="mt-7 grid grid-cols-2 rounded-xl bg-white/5 p-1">
-          <button
-            className={`rounded-lg py-2 text-sm font-semibold ${mode === "login" ? "bg-white/10 text-white" : "text-slate-500"}`}
-            onClick={() => setMode("login")}
-          >
-            Login
-          </button>
-          <button
-            className={`rounded-lg py-2 text-sm font-semibold ${mode === "signup" ? "bg-white/10 text-white" : "text-slate-500"}`}
-            onClick={() => setMode("signup")}
-          >
-            Sign up
-          </button>
-        </div>
-        <form className="mt-5 space-y-4" onSubmit={submitForm}>
-          {mode === "signup" && (
-            <Field
-              label="Full name"
-              name="name"
-              value={form.name}
-              onChange={updateForm}
-            />
-          )}
-          <Field
-            label="Email"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={updateForm}
-            placeholder="you@example.com"
-          />
-          <Field
-            label="Password"
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={updateForm}
-            placeholder="At least 6 characters"
-          />
-          <label className="block text-sm font-semibold text-slate-300">
-            Portal
-            <select
-              className="mt-1 w-full rounded-xl border border-white/10 bg-slate-900 p-3 text-white"
-              value={role}
-              onChange={(event) => setRole(event.target.value)}
-            >
-              <option value="student">Student command center</option>
-              <option value="admin">Admin command center</option>
-            </select>
-          </label>
-          <button className="w-full rounded-xl bg-gradient-to-r from-cyan-400 via-indigo-400 to-fuchsia-400 py-3 font-bold text-slate-950 transition hover:scale-[1.01]">
-            {mode === "login" ? "Enter portal" : "Create account"}
-          </button>
-        </form>
-        <p className="mt-5 text-center text-xs text-slate-500">
-          Demo mode: data is saved in this browser.
-        </p>
-      </section>
-    </main>
-  );
-}
-
-function Student({
-  student,
-  setStudent,
-  jobs,
-  applications,
-  setApplications,
-  view,
-  setView,
-  logout,
-}) {
-  const matches = useMemo(
-    () =>
-      jobs
-        .map((job) => ({
-          ...job,
-          score: Math.round(
-            (job.skills.filter((skill) =>
-              student.skills
-                .map((value) => value.toLowerCase())
-                .includes(skill.toLowerCase()),
-            ).length *
-              100) /
-              job.skills.length,
-          ),
-        }))
-        .sort((a, b) => b.score - a.score),
-    [jobs, student.skills],
-  );
-  const [skill, setSkill] = useState("");
-  const apply = (job) => {
-    if (!applications.some((item) => item.jobId === job.id))
-      setApplications([
-        ...applications,
-        {
-          id: Date.now(),
-          jobId: job.id,
-          title: job.title,
-          company: job.company,
-          status: "Submitted",
-          date: new Date().toLocaleDateString(),
-        },
-      ]);
-  };
-  const content =
-    view === "dashboard" ? (
-      <>
-        <Hero student={student} />
-        <Stats
-          values={[
-            ["Skills", student.skills.length],
-            ["Applications", applications.length],
-            ["Best match", `${matches[0]?.score ?? 0}%`],
-          ]}
-        />
-        <Heading
-          title="Recommended roles"
-          subtitle="Ranked by your current skills."
-        />
-        <div className="grid gap-5 md:grid-cols-3">
-          {matches.slice(0, 3).map((job) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              applied={applications.some((item) => item.jobId === job.id)}
-              apply={apply}
-            />
-          ))}
-        </div>
-      </>
-    ) : view === "jobs" ? (
-      <Page title="Browse jobs" subtitle="Find roles that fit your profile.">
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {matches.map((job) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              applied={applications.some((item) => item.jobId === job.id)}
-              apply={apply}
-            />
-          ))}
-        </div>
-      </Page>
-    ) : view === "skills" ? (
-      <Page
-        title="My skills"
-        subtitle="Keep this list current to improve matching."
-      >
-        <form
-          className="mb-6 flex max-w-lg gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const value = skill.trim();
-            if (value && !student.skills.includes(value))
-              setStudent({ ...student, skills: [...student.skills, value] });
-            setSkill("");
-          }}
-        >
-          <input
-            className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3"
-            value={skill}
-            onChange={(e) => setSkill(e.target.value)}
-            placeholder="Add a skill"
-          />
-          <button className="rounded-lg bg-teal-600 px-4 py-2 font-semibold text-white">
-            Add
-          </button>
-        </form>
-        <div className="flex flex-wrap gap-2">
-          {student.skills.map((item) => (
-            <button
-              className="rounded-full bg-teal-50 px-4 py-2 text-sm font-medium text-teal-800"
-              onClick={() =>
-                setStudent({
-                  ...student,
-                  skills: student.skills.filter((value) => value !== item),
-                })
-              }
-              key={item}
-            >
-              {item} ×
-            </button>
-          ))}
-        </div>
-      </Page>
-    ) : view === "gap" ? (
-      <Page
-        title="Skill gap analysis"
-        subtitle="Core skills missing from each available role."
-      >
-        <div className="space-y-3">
-          {matches.map((job) => (
-            <div
-              className="rounded-xl border border-slate-200 bg-white p-5"
-              key={job.id}
-            >
-              <div className="flex flex-wrap justify-between gap-2">
-                <div>
-                  <h3 className="font-bold">{job.title}</h3>
-                  <p className="text-sm text-slate-500">
-                    {job.company} · {job.score}% match
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {job.skills
-                    .filter(
-                      (x) =>
-                        !student.skills
-                          .map((s) => s.toLowerCase())
-                          .includes(x.toLowerCase()),
-                    )
-                    .map((x) => (
-                      <span
-                        className="rounded-full bg-orange-50 px-3 py-1 text-sm text-orange-700"
-                        key={x}
-                      >
-                        {x}
-                      </span>
-                    )) || (
-                    <span className="text-teal-700">
-                      All core skills covered
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Page>
-    ) : (
-      <Page
-        title="My applications"
-        subtitle="Every application submitted from the portal."
-      >
-        <Applications items={applications} />
-      </Page>
-    );
-  return (
-    <Shell
-      nav={["dashboard", "jobs", "skills", "gap", "applications"]}
-      view={view}
-      setView={setView}
-      logout={logout}
-    >
-      {content}
-    </Shell>
-  );
-}
-
-function Admin({ jobs, setJobs, applications, view, setView, logout }) {
-  const [draft, setDraft] = useState({
-    title: "",
-    company: "",
-    location: "",
-    skills: "",
-  });
-  const content =
-    view === "dashboard" ? (
-      <>
-        <Stats
-          values={[
-            ["Live jobs", jobs.length],
-            ["Applications", applications.length],
-            ["Students", 1],
-          ]}
-        />
-        <Heading title="Recent applications" />
-        <Applications items={applications} />
-      </>
-    ) : view === "jobs" ? (
-      <Page title="Manage jobs" subtitle="Publish and remove openings.">
-        <form
-          className="mb-6 grid gap-3 rounded-xl border border-slate-200 bg-white p-5 md:grid-cols-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!draft.title || !draft.company) return;
-            setJobs([
-              ...jobs,
-              {
-                ...draft,
-                id: Date.now(),
-                skills: draft.skills
-                  .split(",")
-                  .map((x) => x.trim())
-                  .filter(Boolean),
-              },
-            ]);
-            setDraft({ title: "", company: "", location: "", skills: "" });
-          }}
-        >
-          {Object.entries(draft).map(([key, value]) => (
-            <input
-              className="rounded-lg border border-slate-300 px-3 py-2"
-              placeholder={
-                key === "skills"
-                  ? "Skills (comma separated)"
-                  : key[0].toUpperCase() + key.slice(1)
-              }
-              value={value}
-              onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
-              key={key}
-            />
-          ))}
-          <button className="rounded-lg bg-teal-600 px-4 py-2 font-bold text-white">
-            Publish job
-          </button>
-        </form>
-        <div className="grid gap-5 md:grid-cols-2">
-          {jobs.map((job) => (
-            <div
-              className="rounded-xl border border-slate-200 bg-white p-5"
-              key={job.id}
-            >
-              <h3 className="font-bold">{job.title}</h3>
-              <p className="text-sm text-slate-500">
-                {job.company} · {job.location}
-              </p>
-              <button
-                className="mt-4 text-sm font-semibold text-rose-600"
-                onClick={() =>
-                  setJobs(jobs.filter((item) => item.id !== job.id))
-                }
-              >
-                Remove listing
-              </button>
-            </div>
-          ))}
-        </div>
-      </Page>
-    ) : view === "students" ? (
-      <Page title="Students">
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <b>Aarav Kumar</b>
-          <p className="mt-1 text-slate-500">
-            aarav@example.com · React, JavaScript, CSS
-          </p>
-        </div>
-      </Page>
-    ) : (
-      <Page title="All applications">
-        <Applications items={applications} />
-      </Page>
-    );
-  return (
-    <Shell
-      nav={["dashboard", "jobs", "students", "applications"]}
-      view={view}
-      setView={setView}
-      logout={logout}
-    >
-      {content}
-    </Shell>
-  );
-}
-
-function Shell({ nav, view, setView, logout, children }) {
-  return (
-    <div className="min-h-screen bg-[#080d1b] text-slate-100 md:flex">
-      <aside className="relative flex overflow-hidden border-b border-white/10 bg-[#0d1428] p-5 md:min-h-screen md:w-72 md:flex-col md:border-b-0 md:border-r">
-        <div className="absolute -left-16 top-20 h-44 w-44 rounded-full bg-cyan-400/15 blur-3xl" />
-        <Brand />
-        <p className="relative mt-7 hidden text-[10px] font-bold uppercase tracking-[.22em] text-slate-500 md:block">
-          Fusion modules
-        </p>
-        <nav className="relative ml-6 flex gap-2 overflow-auto md:ml-0 md:mt-3 md:flex-col">
-          {nav.map((item, index) => (
-            <button
-              className={`rounded-xl px-3 py-3 text-left text-sm font-semibold capitalize transition ${view === item ? "bg-gradient-to-r from-cyan-400/15 to-indigo-400/15 text-cyan-200 ring-1 ring-cyan-300/20" : "text-slate-400 hover:bg-white/5 hover:text-white"}`}
-              onClick={() => setView(item)}
-              key={item}
-            >
-              <span className="mr-3 text-xs text-cyan-300/70">
-                0{index + 1}
-              </span>
-              {item.replace("gap", "skill gap")}
-            </button>
-          ))}
-        </nav>
-        <button
-          className="relative ml-auto text-sm text-rose-300 md:ml-0 md:mt-auto"
-          onClick={logout}
-        >
-          ◌ Disconnect
-        </button>
-      </aside>
-      <main className="relative mx-auto w-full max-w-6xl overflow-hidden p-6 md:p-10">
-        <div className="pointer-events-none absolute right-0 top-0 h-80 w-80 rounded-full bg-indigo-500/10 blur-[100px]" />
-        <div className="relative">{children}</div>
-      </main>
-    </div>
-  );
-}
 function Brand() {
-  return (
-    <div className="relative flex items-center gap-3">
-      <img
-        className="h-10 w-10"
-        src="/src/assets/icons/starkfusion-mark.svg"
-        alt="StarkFusion logo"
-      />
-      <div className="text-xl font-bold tracking-tight text-white">
-        Stark
-        <span className="bg-gradient-to-r from-cyan-300 to-fuchsia-300 bg-clip-text text-transparent">
-          Fusion
-        </span>
-        <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[.25em] text-slate-500">
-          intelligence hub
-        </p>
-      </div>
-    </div>
-  );
+  return <div className="sf-brand"><img src={logo} alt="" /><div>Stark<span>Fusion</span><small>CAREER INTELLIGENCE</small></div></div>;
 }
-function Field({ label, name, type = "text", value, onChange, placeholder }) {
-  return (
-    <label className="block text-sm font-semibold text-slate-300">
-      {label}
-      <input
-        className="mt-1 w-full rounded-xl border border-white/10 bg-slate-900 p-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/60"
-        name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        required
-      />
-    </label>
-  );
+
+function Login() {
+  const { signIn } = useAuth();
+  const [mode, setMode] = useState("login");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  async function submit(event) {
+    event.preventDefault();
+    const account = values(event.currentTarget);
+    setBusy(true); setError("");
+    try {
+      if (mode === "signup") await auth.register(account);
+      signIn(await auth.login({ email: account.email, password: account.password }));
+    } catch (failure) { setError(errorText(failure)); }
+    finally { setBusy(false); }
+  }
+  return <main className="sf-login"><section className="sf-login-card">
+    <Brand /><p className="sf-eyebrow">Your next step starts here</p>
+    <h1>{mode === "login" ? "Welcome back." : "Create your profile."}</h1>
+    <p className="sf-muted">Connect your skills with real opportunities.</p>
+    <div className="sf-tabs">{["login", "signup"].map((item) => <button key={item} disabled={busy} className={mode === item ? "active" : ""} onClick={() => { setMode(item); setError(""); }}>{item === "login" ? "Login" : "Sign up"}</button>)}</div>
+    {error && <p className="sf-error" role="alert">{error}</p>}
+    <form onSubmit={submit}><fieldset disabled={busy}>
+      {mode === "signup" && <Input label="Full name" name="name" maxLength={100} autoComplete="name" />}
+      <Input label="Email" name="email" type="email" maxLength={100} autoComplete="username" />
+      <Input label="Password" name="password" type="password" minLength={mode === "signup" ? 6 : 1} maxLength={72} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
+      <button className="sf-primary sf-wide" type="submit">{busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}</button>
+    </fieldset></form>
+    <p className="sf-muted sf-footnote">{mode === "signup" ? "Sign up creates a student account." : "Your account determines your admin or student workspace."}</p>
+  </section></main>;
 }
-function Hero({ student }) {
-  return (
-    <section className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-[#151d3a] via-[#101a32] to-[#261339] p-7 text-white">
-      <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full border border-cyan-300/20" />
-      <div className="absolute right-14 top-8 h-20 w-20 rounded-full border border-fuchsia-300/20" />
-      <p className="relative text-xs font-bold uppercase tracking-[.25em] text-cyan-300">
-        Fusion signal / career snapshot
-      </p>
-      <h1 className="relative mt-3 text-3xl font-bold tracking-tight">
-        Ready to ignite, {student.name.split(" ")[0]}?
-      </h1>
-      <p className="relative mt-2 max-w-xl text-slate-300">
-        Your skills are mapped against live opportunity signals in real time.
-      </p>
-    </section>
-  );
+
+async function loadWorkspace(admin) {
+  const [jobs, catalog, applications, account] = await Promise.all([
+    jobsApi.getJobs(), skillsApi.getSkills(),
+    admin ? applicationsApi.getApplications() : applicationsApi.getStudentApplications(),
+    admin ? getDashboardStats() : studentsApi.getStudentProfile(),
+  ]);
+  const detailedJobs = await Promise.all(jobs.data.map(async (job) => {
+    if (admin) return { ...job, requiredSkills: (await jobsApi.getJobSkills(job.jobId)).data };
+    const [analysis, recommendations] = await Promise.all([getSkillGaps(job.jobId), getRecommendations(job.jobId)]);
+    return { ...job, analysis: analysis.data, recommendations: recommendations.data };
+  }));
+  const people = admin ? (await studentsApi.getStudents()).data : (await skillsApi.getStudentSkills()).data;
+  return { jobs: detailedJobs, catalog: catalog.data, applications: applications.data, account: account.data, people };
 }
-function Stats({ values }) {
-  return (
-    <section className="my-6 grid gap-4 sm:grid-cols-3">
-      {values.map(([label, value]) => (
-        <div
-          className="rounded-xl border border-slate-200 bg-white p-5"
-          key={label}
-        >
-          <strong className="block text-3xl text-teal-700">{value}</strong>
-          <span className="text-sm text-slate-500">{label}</span>
-        </div>
-      ))}
-    </section>
-  );
+
+function Workspace({ user }) {
+  const { signOut } = useAuth();
+  const admin = user.role === ROLES.ADMIN;
+  const [view, setView] = useState("dashboard");
+  const [data, setData] = useState(null);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let active = true;
+    loadWorkspace(admin).then((result) => { if (active) setData(result); }).catch((failure) => { if (active) setError(errorText(failure)); });
+    return () => { active = false; };
+  }, [admin]);
+  async function run(action, message = "Changes saved.") {
+    if (busy) return false;
+    setBusy(true); setError(""); setNotice("");
+    try { await action(); setData(await loadWorkspace(admin)); setNotice(message); return true; }
+    catch (failure) { setError(errorText(failure)); return false; }
+    finally { setBusy(false); }
+  }
+  const nav = admin ? ["dashboard", "jobs", "skills", "students", "applications"] : ["dashboard", "jobs", "skills", "gap", "applications", "profile"];
+  return <div className="sf-shell"><aside className="sf-sidebar"><Brand />
+    <p className="sf-eyebrow">{admin ? "Admin workspace" : "Student workspace"}</p>
+    <nav aria-label="Main navigation">{nav.map((item) => <button className={view === item ? "active" : ""} key={item} onClick={() => { setView(item); setError(""); setNotice(""); }}>{item === "gap" ? "Skill gap" : item}</button>)}</nav>
+    <div className="sf-account"><strong>{user.name}</strong><small>{user.email}</small><button onClick={signOut}>Sign out</button></div>
+  </aside><main className="sf-main">
+    <header className="sf-header"><span className="sf-eyebrow">Build your next chapter</span><button className="sf-secondary" disabled={busy} onClick={() => run(async () => {}, "Data refreshed.")}>{busy ? "Saving…" : "Refresh"}</button></header>
+    {error && <div className="sf-error" role="alert">{error}</div>}
+    {notice && <div className="sf-notice" role="status">{notice}</div>}
+    {!data ? <p role="status">{error ? "Use Refresh to try again." : "Loading your workspace…"}</p> : admin ? <AdminViews data={data} view={view} run={run} busy={busy} /> : <StudentViews data={data} view={view} run={run} busy={busy} />}
+  </main></div>;
 }
-function Heading({ title, subtitle }) {
-  return (
-    <div className="mb-5">
-      <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
-      {subtitle && <p className="mt-1 text-slate-500">{subtitle}</p>}
-    </div>
-  );
+
+function StudentViews({ data, view, run, busy }) {
+  const ranked = [...data.jobs].sort((a, b) => b.analysis.overallMatchPercent - a.analysis.overallMatchPercent);
+  if (view === "profile") return <><Heading title="My profile" subtitle="Your registered student account." /><section className="sf-card"><h2>{data.account.name}</h2><p>{data.account.email}</p><p className="sf-muted">Student ID: {data.account.studentId}</p></section></>;
+  if (view === "skills") return <><Heading title="My skills" subtitle="Choose a catalog skill and set your current proficiency." />
+    <form className="sf-card" onSubmit={async (event) => {
+      event.preventDefault(); const form = event.currentTarget; const draft = values(form);
+      if (await run(() => skillsApi.addStudentSkill({ skillId: Number(draft.skillId), proficiency: Number(draft.proficiency) }))) form.reset();
+    }}><fieldset disabled={busy || !data.catalog.length} className="sf-form-grid">
+      <SkillSelect catalog={data.catalog} /><LevelSelect name="proficiency" label="Proficiency" />
+      <button className="sf-primary">Save skill</button>
+    </fieldset>{!data.catalog.length && <p className="sf-muted">No skills are available yet. An administrator needs to add skills to the catalog.</p>}</form>
+    <div className="sf-grid">{data.people.map((skill) => <article className="sf-card" key={skill.skillId}><h2>{skill.skillName}</h2><p>{skill.category}</p><p className="sf-muted">Level {skill.proficiency} · {levels[skill.proficiency - 1]}</p><button className="sf-danger" disabled={busy} onClick={() => run(() => skillsApi.removeStudentSkill(skill.skillId), "Skill removed.")}>Remove {skill.skillName}</button></article>)}</div>
+    {!data.people.length && <Empty>No skills added yet.</Empty>}
+  </>;
+  if (view === "applications") return <><Heading title="My applications" subtitle="Application scores are saved at submission." /><Applications items={data.applications} /></>;
+  if (view === "gap") return <><Heading title="Skill gap analysis" subtitle="Compare proficiency levels and follow prioritized recommendations." />
+    {!ranked.length && <Empty>No jobs have been published yet.</Empty>}
+    {ranked.map((job) => <section className="sf-card" key={job.jobId}><h2>{job.title}</h2><p className="sf-muted">{job.company} · {job.analysis.overallMatchPercent}% match</p>
+      {!job.analysis.evaluable ? <p>No skill requirements have been configured for this job.</p> : <div className="sf-table-wrap"><table><thead><tr><th>Skill</th><th>Current</th><th>Required</th><th>Gap</th><th>Requirement</th></tr></thead><tbody>{job.analysis.skills.map((skill) => <tr key={skill.skillId}><td>{skill.skillName}</td><td>{skill.currentLevel}</td><td>{skill.requiredLevel}</td><td>{skill.gap}</td><td>{skill.mandatory ? "Mandatory" : "Optional"}</td></tr>)}</tbody></table></div>}
+      <h3>Recommendations</h3>{job.recommendations.length ? <ul className="sf-advice">{job.recommendations.map((item) => <li key={item.skillId}><strong>Priority {item.priority}</strong> {item.reason}</li>)}</ul> : <p className="sf-muted">{job.analysis.evaluable ? "All required proficiency levels are met." : "Recommendations appear when requirements are configured."}</p>}
+    </section>)}</>;
+  return <>{view === "dashboard" ? <><section className="sf-hero"><p className="sf-eyebrow">Your career snapshot</p><h1>Welcome, {data.account.name}.</h1><p>Track your skills and discover your next opportunity.</p></section><Stats items={[["Skills", data.people.length], ["Applications", data.applications.length], ["Best match", `${ranked[0]?.analysis.overallMatchPercent ?? 0}%`]]} /><Heading title="Recommended roles" /></> : <Heading title="Browse jobs" subtitle="Matches use your current proficiency and each job's requirements." />}
+    {!ranked.length && <Empty>No jobs have been published yet.</Empty>}
+    <div className="sf-grid">{(view === "dashboard" ? ranked.slice(0, 3) : ranked).map((job) => <article className="sf-card" key={job.jobId}><span className="sf-badge">{job.analysis.overallMatchPercent}% match</span><h2>{job.title}</h2><p className="sf-muted">{job.company} · {job.location}</p><div className="sf-tags">{job.analysis.skills.map((skill) => <span key={skill.skillId}>{skill.skillName} · {skill.requiredLevel}</span>)}</div>{!job.analysis.evaluable && <p className="sf-muted">Requirements are not configured yet.</p>}<button className="sf-primary" disabled={busy || data.applications.some((item) => item.jobId === job.jobId)} onClick={() => run(() => applicationsApi.createApplication({ jobId: job.jobId }), "Application submitted.")}>{data.applications.some((item) => item.jobId === job.jobId) ? "Applied" : `Apply for ${job.title}`}</button></article>)}</div>
+  </>;
 }
-function Page({ title, subtitle, children }) {
-  return (
-    <>
-      <Heading title={title} subtitle={subtitle} />
-      {children}
-    </>
-  );
+
+function AdminViews({ data, view, run, busy }) {
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [editSkill, setEditSkill] = useState(null);
+  if (view === "dashboard") return <><Heading title="Admin dashboard" subtitle="Current activity across the platform." /><Stats items={[["Students", data.account.totalStudents], ["Jobs", data.account.totalJobs], ["Applications", data.account.totalApplications], ["Average application match", `${data.account.averageSkillMatch}%`]]} /><Heading title="Recent applications" /><Applications items={data.applications.slice(0, 10)} admin busy={busy} run={run} /></>;
+  if (view === "applications") return <><Heading title="All applications" subtitle="Review applications and update their status." /><Applications items={data.applications} admin busy={busy} run={run} /></>;
+  if (view === "students") return <><Heading title="Students" subtitle="Student accounts are created through registration." />{!data.people.length && <Empty>No students have registered yet.</Empty>}<div className="sf-grid">{data.people.map((student) => <article className="sf-card" key={student.studentId}><h2>{student.name}</h2><p>{student.email}</p><button className="sf-secondary" onClick={() => setSelectedStudent(student.studentId)}>View skills for {student.name}</button></article>)}</div>{selectedStudent && <StudentDetails key={selectedStudent} id={selectedStudent} close={() => setSelectedStudent(null)} />}</>;
+  if (view === "skills") return <><Heading title="Skill catalog" subtitle="Define the skills available to students and jobs." />
+    <form className="sf-card" key={editSkill?.skillId ?? "new"} onSubmit={async (event) => {
+      event.preventDefault(); const form = event.currentTarget; const request = values(form);
+      if (await run(() => editSkill ? skillsApi.updateSkill(editSkill.skillId, request) : skillsApi.createSkill(request))) { form.reset(); setEditSkill(null); }
+    }}><fieldset disabled={busy} className="sf-form-grid"><Input label="Skill name" name="name" maxLength={120} defaultValue={editSkill?.name ?? ""} /><Input label="Category" name="category" maxLength={120} defaultValue={editSkill?.category ?? ""} /><button className="sf-primary">{editSkill ? "Update skill" : "Create skill"}</button>{editSkill && <button type="button" className="sf-secondary" onClick={() => setEditSkill(null)}>Cancel edit</button>}</fieldset></form>
+    <div className="sf-grid">{data.catalog.map((skill) => <article className="sf-card" key={skill.skillId}><h2>{skill.name}</h2><p className="sf-muted">{skill.category}</p><div className="sf-actions"><button className="sf-secondary" onClick={() => setEditSkill(skill)}>Edit {skill.name}</button><button className="sf-danger" disabled={busy} onClick={() => run(() => skillsApi.deleteSkill(skill.skillId), "Skill deleted.")}>Delete {skill.name}</button></div></article>)}</div>{!data.catalog.length && <Empty>Create the first skill above.</Empty>}
+  </>;
+  const job = data.jobs.find((item) => item.jobId === selectedJob);
+  return <><Heading title="Manage jobs" subtitle="Publish jobs and define their required proficiency levels." />
+    <JobForm busy={busy} submit={async (request) => run(() => jobsApi.createJob(request), "Job created. Add its skill requirements below.")} />
+    {!data.jobs.length && <Empty>No jobs yet. Publish your first job above.</Empty>}
+    <div className="sf-grid">{data.jobs.map((item) => <article className="sf-card" key={item.jobId}><h2>{item.title}</h2><p className="sf-muted">{item.company} · {item.location}</p><p>{item.requiredSkills.length} skill requirements</p><div className="sf-actions"><button className="sf-secondary" onClick={() => setSelectedJob(item.jobId)}>Manage {item.title}</button><button className="sf-danger" disabled={busy} onClick={async () => { if (await run(() => jobsApi.deleteJob(item.jobId), "Job deleted.")) setSelectedJob(null); }}>Delete {item.title}</button></div></article>)}</div>
+    {job && <section className="sf-card"><div className="sf-header"><h2>Manage {job.title}</h2><button className="sf-secondary" onClick={() => setSelectedJob(null)}>Close job editor</button></div>
+      <JobForm key={`${job.jobId}-${job.title}-${job.company}-${job.location}`} job={job} busy={busy} submit={(request) => run(() => jobsApi.updateJob(job.jobId, request))} />
+      <h3>Required skills</h3><form onSubmit={async (event) => { event.preventDefault(); const draft = values(event.currentTarget); await run(() => jobsApi.addJobSkill(job.jobId, { skillId: Number(draft.skillId), requiredLevel: Number(draft.requiredLevel), mandatory: draft.mandatory === "on" })); }}><fieldset disabled={busy || !data.catalog.length} className="sf-form-grid"><SkillSelect catalog={data.catalog} /><LevelSelect name="requiredLevel" label="Required level" /><label className="sf-checkbox"><input type="checkbox" name="mandatory" defaultChecked /> Mandatory</label><button className="sf-primary">Save requirement</button></fieldset></form>
+      {!data.catalog.length && <p className="sf-muted">Create catalog skills before defining requirements.</p>}
+      {job.requiredSkills.map((skill) => <div className="sf-requirement" key={skill.skillId}><span>{skill.skillName} · level {skill.requiredLevel} · {skill.mandatory ? "Mandatory" : "Optional"}</span><button className="sf-danger" disabled={busy} onClick={() => run(() => jobsApi.removeJobSkill(job.jobId, skill.skillId), "Requirement removed.")}>Remove {skill.skillName}</button></div>)}
+    </section>}
+  </>;
 }
-function JobCard({ job, applied, apply }) {
-  return (
-    <article className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <span className="self-start rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700">
-        {job.score}% match
-      </span>
-      <h3 className="mt-4 font-bold text-slate-900">{job.title}</h3>
-      <p className="mt-1 text-sm text-slate-500">
-        {job.company} · {job.location}
-      </p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {job.skills.map((item) => (
-          <span
-            className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600"
-            key={item}
-          >
-            {item}
-          </span>
-        ))}
-      </div>
-      <button
-        disabled={applied}
-        className="mt-5 rounded-lg bg-teal-600 px-3 py-2 font-semibold text-white disabled:bg-slate-200 disabled:text-slate-500"
-        onClick={() => apply(job)}
-      >
-        {applied ? "Applied" : "Apply now"}
-      </button>
-    </article>
-  );
+
+function StudentDetails({ id, close }) {
+  const [detail, setDetail] = useState(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let active = true;
+    Promise.all([studentsApi.getStudentById(id), studentsApi.getAdminStudentSkills(id)]).then(([student, skills]) => { if (active) setDetail({ student: student.data, skills: skills.data }); }).catch((failure) => { if (active) setError(errorText(failure)); });
+    return () => { active = false; };
+  }, [id]);
+  return <section className="sf-card"><button className="sf-secondary" onClick={close}>Close student details</button>{error && <p role="alert">{error}</p>}{detail ? <><h2>{detail.student.name}</h2><p>{detail.student.email}</p>{detail.skills.length ? <ul>{detail.skills.map((skill) => <li key={skill.skillId}>{skill.skillName}: {skill.proficiency} / 5</li>)}</ul> : <p>No skills added yet.</p>}</> : !error && <p role="status">Loading student…</p>}</section>;
 }
-function Applications({ items }) {
-  return items.length ? (
-    <div className="overflow-auto rounded-xl border border-slate-200 bg-white">
-      <table className="w-full min-w-[520px] text-left text-sm">
-        <thead className="bg-slate-50 text-slate-500">
-          <tr>
-            <th className="p-4">Role</th>
-            <th>Company</th>
-            <th>Status</th>
-            <th>Applied</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => (
-            <tr className="border-t border-slate-100" key={item.id}>
-              <td className="p-4 font-semibold">{item.title}</td>
-              <td>{item.company}</td>
-              <td>
-                <span className="rounded-full bg-teal-50 px-2 py-1 text-xs text-teal-700">
-                  {item.status}
-                </span>
-              </td>
-              <td>{item.date}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  ) : (
-    <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
-      No applications yet.
-    </div>
-  );
+
+function Applications({ items, admin = false, busy = false, run }) {
+  if (!items.length) return <Empty>No applications yet.</Empty>;
+  return <div className="sf-card sf-table-wrap"><table><thead><tr><th>Role</th><th>Company</th>{admin && <th>Student</th>}<th>Match</th><th>Status</th></tr></thead><tbody>{items.map((item) => <tr key={item.id}><td>{item.jobTitle}</td><td>{item.company}</td>{admin && <td>{item.studentName}</td>}<td>{item.matchPercent}%</td><td>{admin ? <select aria-label={`Status for ${item.studentName}, ${item.jobTitle}`} disabled={busy} value={item.status} onChange={(event) => run(() => applicationsApi.updateApplicationStatus(item.id, event.target.value), "Application status updated.")}>{APPLICATION_STATUSES.map((status) => <option key={status}>{status}</option>)}</select> : <span className="sf-badge">{item.status}</span>}</td></tr>)}</tbody></table></div>;
 }
+
+function JobForm({ job, busy, submit }) {
+  return <form className="sf-card" onSubmit={async (event) => { event.preventDefault(); const form = event.currentTarget; if (await submit(values(form)) && !job) form.reset(); }}><fieldset disabled={busy} className="sf-form-grid"><Input label="Job title" name="title" defaultValue={job?.title ?? ""} maxLength={160} /><Input label="Company" name="company" defaultValue={job?.company ?? ""} maxLength={160} /><Input label="Location" name="location" defaultValue={job?.location ?? ""} maxLength={160} /><button className="sf-primary">{job ? "Update job" : "Publish job"}</button></fieldset></form>;
+}
+function Input({ label, ...props }) { return <label className="sf-field">{label}<input required {...props} /></label>; }
+function SkillSelect({ catalog }) { return <label className="sf-field">Skill<select name="skillId" required defaultValue=""><option value="" disabled>Select a skill</option>{catalog.map((skill) => <option key={skill.skillId} value={skill.skillId}>{skill.name}</option>)}</select></label>; }
+function LevelSelect({ label, name }) { return <label className="sf-field">{label}<select name={name} defaultValue="3">{levels.map((level, index) => <option key={level} value={index + 1}>{index + 1} · {level}</option>)}</select></label>; }
+function Heading({ title, subtitle }) { return <div className="sf-heading"><h1>{title}</h1>{subtitle && <p className="sf-muted">{subtitle}</p>}</div>; }
+function Stats({ items }) { return <div className="sf-stats">{items.map(([label, value]) => <div className="sf-card" key={label}><strong>{value}</strong><span>{label}</span></div>)}</div>; }
+function Empty({ children }) { return <div className="sf-empty">{children}</div>; }

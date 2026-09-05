@@ -1,8 +1,5 @@
 import api from "./api";
-export const getStudents = () => api.get("/students");
-export const getStudentById = (studentId) => api.get(`/students/${studentId}`);
-export const createStudent = (student) => api.post("/students", student);
-export const updateStudent = (studentId, student) =>
-  api.put(`/students/${studentId}`, student);
-export const deleteStudent = (studentId) =>
-  api.delete(`/students/${studentId}`);
+export const getStudents = () => api.get("/admin/students");
+export const getStudentById = (id) => api.get(`/admin/students/${id}`);
+export const getStudentProfile = () => api.get("/user/profile");
+export const getAdminStudentSkills = (id) => api.get(`/admin/students/${id}/skills`);

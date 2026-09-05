@@ -1,13 +1,11 @@
 import api from "./api";
-
 export async function login(credentials) {
-  const { data } = await api.post("/auth/login", credentials);
-  return data;
+  return (await api.post("/auth/login", { email: credentials.email, password: credentials.password })).data;
 }
-
-export function register(student) {
-  return api.post("/auth/register", student);
+export async function register(account) {
+  return (await api.post("/auth/register", { name: account.name, email: account.email, password: account.password })).data;
 }
 export function logout() {
   localStorage.removeItem("starkfusion-access-token");
+  localStorage.removeItem("starkfusion-user");
 }

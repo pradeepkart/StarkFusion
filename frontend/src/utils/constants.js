@@ -1,1 +1,2 @@
-export const ROLES = { ADMIN: "admin", STUDENT: "student" };
+export const ROLES = { ADMIN: "ROLE_ADMIN", STUDENT: "ROLE_USER" };
+export const APPLICATION_STATUSES = ["APPLIED", "SHORTLISTED", "REJECTED", "SELECTED"];

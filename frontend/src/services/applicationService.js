@@ -1,8 +1,5 @@
 import api from "./api";
-export const getApplications = () => api.get("/applications");
-export const getStudentApplications = (studentId) =>
-  api.get(`/students/${studentId}/applications`);
-export const createApplication = (application) =>
-  api.post("/applications", application);
-export const updateApplicationStatus = (applicationId, status) =>
-  api.patch(`/applications/${applicationId}/status`, { status });
+export const getApplications = () => api.get("/admin/applications");
+export const getStudentApplications = () => api.get("/user/applications");
+export const createApplication = ({ jobId }) => api.post("/user/applications", { jobId });
+export const updateApplicationStatus = (id, status) => api.put(`/admin/applications/${id}/status`, { status });
